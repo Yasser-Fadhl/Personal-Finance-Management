@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const Jwt = require("jsonwebtoken");
-require("mongoose-type-email");
-mongoose.SchemaTypes.Email.defaults.message = "Email address is invalid";
+const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const validator = require("validator");
 const userSchema = mongoose.Schema({
   name: {
     type: String,
@@ -11,8 +12,9 @@ const userSchema = mongoose.Schema({
     trim: true,
   },
   email: {
-    type: mongoose.SchemaTypes.Email,
+    type: String,
     required: true,
+    validate: [validator.isEmail, "Please enter valid email address"],
     trim: true,
   },
   password: {
@@ -30,37 +32,6 @@ const userSchema = mongoose.Schema({
       type: String,
     },
   },
-  expenses: [
-    {
-      name: {
-        type: String,
-        required: [true, "Please enter expen name"],
-        maxLength: [30, "Expense name cannot exceed 30 characters"],
-        minLength: [5, "Expense name should be at least 5 characters long"],
-      },
-      category: {
-        type: String,
-        required: [true, "Please insert Expense category name"],
-        maxLength: [30, "Expense name cannot exceed 30 characters"],
-      },
-      quantity: {
-        type: Number,
-        required: [true, "Please insert Expense quantity"],
-      },
-      costPerUnit: {
-        type: Number,
-        required: [true, "Please insert Expense cost per unit"],
-      },
-      expensedAt: {
-        type: Date,
-        default: Date.now,
-      },
-    },
-  ],
-  monthlyIncome: {
-    type: Number,
-    required: [true, "Please insert your monthly income"],
-  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -68,6 +39,7 @@ const userSchema = mongoose.Schema({
   resetPasswordToken: String,
   resetPasswordExpire: Date,
 });
+
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
@@ -75,6 +47,7 @@ userSchema.pre("save", async function (next) {
 
   this.password = await bcrypt.hash(this.password, 10);
 });
+
 userSchema.pre("save", function (next) {
   this.email = this.email.toLowerCase();
   next();
@@ -84,8 +57,23 @@ userSchema.methods.comparePassword = async function (insertedPassword) {
 };
 userSchema.methods.assignJwt = async function () {
   return Jwt.sign({ id: this._id }, process.env.JWT_PRIVATE_KEY, {
-    expiresIn: process.env.JWT_EXPIRY,
+    expiresIn: "5h",
   });
+};
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  // Hash and set to resetPasswordToken
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set token expire time
+  this.resetPasswordExpire = Date.now() + 30 * 60 * 1000;
+
+  return resetToken;
 };
 
 module.exports = mongoose.model("User", userSchema);

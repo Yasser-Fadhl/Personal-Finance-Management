@@ -6,6 +6,9 @@ const port = process.env.PORT || 4000;
 const mode = process.env.NODE_ENV;
 databaseConnection();
 
+
+
+
 process.on("uncaughtException", function (err) {
   if (process.env.NODE_ENV === "PRODUCTION") {
     console.log(err.message);

@@ -1,0 +1,8 @@
+.novo:hover {
+  text-decoration: underline;
+  color: "#FAD107";
+}
+.novo:active {
+  text-decoration: underline;
+  color: "#FAD107";
+}

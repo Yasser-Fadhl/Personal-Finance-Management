@@ -15,11 +15,8 @@ const expenseSchema = new mongoose.Schema({
     minLength: [3, "Category should be at least 5 characters long"],
     trim: true,
   },
-  quantity: {
-    type: Number,
-    default: 1,
-  },
-  costPerUnit: {
+
+  amount: {
     type: Number,
     required: [true, "Please enter expense cost"],
   },
@@ -29,11 +26,6 @@ const expenseSchema = new mongoose.Schema({
     required: [true, "Please Login first"],
   },
 
-  expesedAt: { type: Date, default: Date.now },
+  expesedAt: { type: Date },
 });
-
-expenseSchema.method.totalExpense = () => {
-  return this.costPerUnit * this.quantity;
-};
-
 module.exports = mongoose.model("Expense", expenseSchema);

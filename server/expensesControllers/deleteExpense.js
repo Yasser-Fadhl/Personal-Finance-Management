@@ -1,6 +1,4 @@
-const catchAsyncErrors = require("../middleWares/catchAsyncErrors");
 const Expense = require("../models/expense");
-const ErrorHandler = require("../utils/errorHandler");
 
 module.exports = async (req, res, next) => {
   try {

@@ -9,21 +9,15 @@ const forgotPassword = require("../authControllers/forgetPassword");
 const passwordUpdate = require("../authControllers/updatePassword");
 const logout = require("../authControllers/logout");
 const resetPassword = require("../authControllers/resetPassword");
-const ErrorHandler = require("../utils/ErrorHandler");
 const getExpenses = require("../expensesControllers/getExpenses");
-
+const getUser = require("../authControllers/userDetails");
 router.post("/register", register);
-router.get("/login", login);
-router.post("/logout", auth, logout);
+router.post("/login", login);
+router.post("/logout", logout);
 router.put("/update", auth, updateUser);
 router.put("/password/update", auth, passwordUpdate);
 router.post("/password/forgot", forgotPassword);
 router.put("/password/reset/:token", resetPassword);
-router.get("/expenses", auth, getExpenses);
-router.route("/test").post((req, res, next) => {
-  const code = req.body.status;
-  const message = req.body.message;
-  res.status(code).send(new ErrorHandler(message, code));
-});
+router.get("/me", auth, getUser);
 
 module.exports = router;

@@ -25,9 +25,10 @@ module.exports = login = async (req, res, next) => {
       return next(
         res
           .status(400)
-          .json({ success: false, message: "invalid email or password1" })
+          .json({ success: false, message: "invalid email or password" })
       );
     }
+
     sendToken(user, 200, res);
   } catch (ex) {
     (ex) => console.log(ex.message);
